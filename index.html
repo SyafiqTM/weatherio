@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#15172a" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>Weatherio PWA</title>
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="top-bar">
+        <h1>Weatherio</h1>
+        <p>beautiful daily forecast</p>
+      </header>
+
+      <section class="city-card" aria-label="Current city weather card">
+        <div class="city-card__meta">
+          <p class="city-name" id="city-name">San Francisco</p>
+          <p class="current-date" id="current-date">Loading date...</p>
+        </div>
+        <div class="city-card__main">
+          <div>
+            <p class="condition" id="condition">Partly Cloudy</p>
+            <p class="temperature" id="temperature">21°</p>
+          </div>
+          <p class="high-low" id="high-low">H: 24° • L: 17°</p>
+        </div>
+      </section>
+
+      <section class="layer-grid" aria-label="Weather details">
+        <article class="detail-layer detail-layer--wind">
+          <h2>2nd Layer · Wind</h2>
+          <p class="detail-value" id="wind">12 km/h</p>
+          <p class="detail-sub">Gentle west breeze</p>
+        </article>
+        <article class="detail-layer detail-layer--humidity">
+          <h2>3rd Layer · Humidity</h2>
+          <p class="detail-value" id="humidity">66%</p>
+          <p class="detail-sub">Comfortable indoor feel</p>
+        </article>
+      </section>
+
+      <section class="timeline" aria-label="Weather across morning to tonight">
+        <h2>Morning → Tonight</h2>
+        <div class="timeline-track" id="timeline-track"></div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
