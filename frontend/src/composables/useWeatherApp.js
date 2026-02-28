@@ -1,6 +1,10 @@
 import { computed, onMounted, ref } from "vue";
 import { cachedFetch } from "../utils/apiCache.js";
 
+// In dev: empty string → relative /api/* paths forwarded by Vite proxy.
+// In prod: resolves to the deployed Flask backend on Vercel.
+const BASE_URL = import.meta.env.VITE_BACKEND_URL ?? "";
+
 // Cache TTLs (seconds)
 const TTL_WEATHER  = 10 * 60;   // current conditions  – 10 min
 const TTL_HOURLY   = 30 * 60;   // hourly forecast     – 30 min
@@ -197,9 +201,9 @@ export function useWeatherApp() {
     try {
       const city = encodeURIComponent(cityInput.value);
       const [weatherRes, forecastRes, hourlyRes] = await Promise.all([
-        cachedFetch(`/api/weather?city=${city}`,          TTL_WEATHER),
-        cachedFetch(`/api/daily-forecast?city=${city}`,   TTL_DAILY),
-        cachedFetch(`/api/hourly-forecast?city=${city}`,  TTL_HOURLY),
+        cachedFetch(`${BASE_URL}/api/weather?city=${city}`,          TTL_WEATHER),
+        cachedFetch(`${BASE_URL}/api/daily-forecast?city=${city}`,   TTL_DAILY),
+        cachedFetch(`${BASE_URL}/api/hourly-forecast?city=${city}`,  TTL_HOURLY),
       ]);
 
       if (!weatherRes.ok) {
@@ -247,7 +251,7 @@ export function useWeatherApp() {
 
   async function fetchCities() {
     try {
-      const res = await cachedFetch("/api/cities", TTL_CITIES);
+      const res = await cachedFetch(`${BASE_URL}/api/cities`, TTL_CITIES);
       if (!res.ok) throw new Error("Failed to fetch city list");
       const payload = await res.json();
       if (Array.isArray(payload.cities) && payload.cities.length) {
