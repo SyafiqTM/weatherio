@@ -12,7 +12,13 @@ BASE_DIR = Path(__file__).resolve().parent
 load_dotenv(BASE_DIR / ".env")
 
 app = Flask(__name__)
-CORS(app)
+
+# Read allowed origins from env var (comma-separated).
+# Default to wildcard so local dev always works.
+# On Vercel set:  ALLOWED_ORIGINS=https://weatherio-two.vercel.app
+_raw_origins = os.environ.get("ALLOWED_ORIGINS", "*")
+_origins = [o.strip() for o in _raw_origins.split(",")] if _raw_origins != "*" else "*"
+CORS(app, origins=_origins, supports_credentials=False)
 
 GOOGLE_WEATHER_BASE = "https://weather.googleapis.com/v1"
 API_TIMEOUT_SECONDS = 12
