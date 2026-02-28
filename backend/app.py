@@ -1,4 +1,5 @@
 import os
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -15,6 +16,29 @@ CORS(app)
 
 GOOGLE_WEATHER_BASE = "https://weather.googleapis.com/v1"
 API_TIMEOUT_SECONDS = 12
+
+# ── In-memory API response cache ─────────────────────────────────────────────
+# Prevents hammering the Google Weather API on every browser request.
+# Key: cache_key string  →  Value: (fetched_at_timestamp, response_dict)
+_api_cache: dict[str, tuple[float, dict]] = {}
+
+_TTL_CURRENT = 10 * 60   # 10 min  – current conditions
+_TTL_HOURLY  = 30 * 60   # 30 min  – hourly forecast
+_TTL_DAILY   = 60 * 60   # 60 min  – daily forecast
+
+
+def _cached_weather_request(cache_key: str, ttl: int, path: str, params: dict, api_key: str) -> dict:
+    """Return a cached response if fresh, otherwise fetch and store it."""
+    now = time.monotonic()
+    entry = _api_cache.get(cache_key)
+    if entry is not None:
+        fetched_at, data = entry
+        if now - fetched_at < ttl:
+            return data
+    data = _weather_request(path, params, api_key)
+    _api_cache[cache_key] = (now, data)
+    return data
+# ─────────────────────────────────────────────────────────────────────────────
 
 MALAYSIA_CITIES: list[dict[str, object]] = [
     {"city": "Kuala Lumpur", "lat": 3.1390, "lng": 101.6869},
@@ -143,21 +167,18 @@ def get_weather():
     lng = selected_city["lng"]
 
     try:
-        current_payload = _weather_request(
+        current_payload = _cached_weather_request(
+            f"current:{lat},{lng}",
+            _TTL_CURRENT,
             "/currentConditions:lookup",
-            {
-                "location.latitude": lat,
-                "location.longitude": lng,
-            },
+            {"location.latitude": lat, "location.longitude": lng},
             api_key,
         )
-        daily_payload = _weather_request(
+        daily_payload = _cached_weather_request(
+            f"daily4:{lat},{lng}",
+            _TTL_DAILY,
             "/forecast/days:lookup",
-            {
-                "location.latitude": lat,
-                "location.longitude": lng,
-                "days": 4,
-            },
+            {"location.latitude": lat, "location.longitude": lng, "days": 4},
             api_key,
         )
     except requests.HTTPError as exc:
@@ -183,13 +204,11 @@ def get_hourly_forecast():
     lng = selected_city["lng"]
 
     try:
-        hourly_payload = _weather_request(
+        hourly_payload = _cached_weather_request(
+            f"hourly240:{lat},{lng}",
+            _TTL_HOURLY,
             "/forecast/hours:lookup",
-            {
-                "location.latitude": lat,
-                "location.longitude": lng,
-                "hours": 240,
-            },
+            {"location.latitude": lat, "location.longitude": lng, "hours": 240},
             api_key,
         )
     except requests.HTTPError as exc:
@@ -215,13 +234,11 @@ def get_daily_forecast():
     lng = selected_city["lng"]
 
     try:
-        daily_payload = _weather_request(
+        daily_payload = _cached_weather_request(
+            f"daily10:{lat},{lng}",
+            _TTL_DAILY,
             "/forecast/days:lookup",
-            {
-                "location.latitude": lat,
-                "location.longitude": lng,
-                "days": 10,
-            },
+            {"location.latitude": lat, "location.longitude": lng, "days": 10},
             api_key,
         )
     except requests.HTTPError as exc:
