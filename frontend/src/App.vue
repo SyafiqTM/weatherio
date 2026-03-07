@@ -100,11 +100,73 @@
         </div>
       </section>
 
-      <!-- <p v-if="loading" class="status">Fetching weather…</p> -->
+      <!-- Forecast board skeleton -->
+      <section v-else-if="loading" class="forecast-board" aria-hidden="true">
+        <div class="skel" style="width:150px;height:13px;margin-bottom:14px;border-radius:6px"></div>
+        <div class="day-selector">
+          <div v-for="i in 5" :key="i" class="day-card" style="pointer-events:none;gap:6px">
+            <div class="skel" style="width:28px;height:10px;border-radius:4px"></div>
+            <div class="skel" style="width:36px;height:9px;border-radius:4px"></div>
+            <div class="skel" style="width:30px;height:30px;border-radius:50%"></div>
+            <div class="skel" style="width:24px;height:12px;border-radius:4px"></div>
+          </div>
+        </div>
+        <div class="day-detail" style="margin-top:10px">
+          <div class="detail-row">
+            <div v-for="p in 2" :key="p" class="detail-card" style="gap:12px">
+              <div class="skel" style="width:110px;height:10px;border-radius:4px"></div>
+              <div class="skel" style="width:150px;height:16px;border-radius:6px"></div>
+              <div class="skel" style="width:120px;height:10px;border-radius:4px"></div>
+              <div class="skel" style="width:100px;height:10px;border-radius:4px"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <p v-else-if="error" class="status status--error">{{ error }}</p>
     </section>
 
-    <aside class="dashboard-right" v-if="weather">
+    <aside class="dashboard-right" v-if="weather || loading">
+      <!-- Right panel skeleton -->
+      <template v-if="loading">
+        <header class="right-top">
+          <div class="skel" style="width:120px;height:22px;border-radius:8px"></div>
+          <div class="avatar skel" />
+        </header>
+        <section class="today-block">
+          <div class="skel" style="width:50px;height:14px;border-radius:4px;margin-bottom:6px"></div>
+          <div class="skel" style="width:90px;height:13px;border-radius:4px;margin-bottom:14px"></div>
+          <div class="skel" style="width:110px;height:68px;border-radius:12px;margin-bottom:10px"></div>
+          <div class="skel" style="width:130px;height:16px;border-radius:4px;margin-bottom:8px"></div>
+          <div class="skel" style="width:210px;height:13px;border-radius:4px"></div>
+        </section>
+        <section class="hourly-forecast">
+          <div class="skel" style="width:175px;height:13px;border-radius:4px;margin-bottom:14px"></div>
+          <div class="hourly-forecast__row">
+            <div class="skel" style="width:28px;height:28px;border-radius:8px;flex-shrink:0"></div>
+            <div class="hourly-forecast__cards">
+              <div v-for="i in 5" :key="i" class="hour-card" style="background:rgba(255,255,255,0.05);gap:5px">
+                <div class="skel" style="width:28px;height:9px;border-radius:3px"></div>
+                <div class="skel" style="width:28px;height:28px;border-radius:50%"></div>
+                <div class="skel" style="width:26px;height:9px;border-radius:3px"></div>
+                <div class="skel" style="width:14px;height:9px;border-radius:3px"></div>
+              </div>
+            </div>
+            <div class="skel" style="width:28px;height:28px;border-radius:8px;flex-shrink:0"></div>
+          </div>
+          <div class="hourly-forecast__temps">
+            <div class="skel" style="width:160px;height:10px;border-radius:3px;margin-bottom:8px"></div>
+            <div class="temps-row">
+              <div v-for="i in 5" :key="i" class="temp-cell">
+                <div class="skel" style="width:28px;height:10px;border-radius:3px"></div>
+                <div class="skel" style="width:22px;height:9px;border-radius:3px;margin-top:2px"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </template>
+
+      <template v-else>
       <header class="right-top">
         <div class="bell-wrap">
           <p class="mr-2">Notifications</p>
@@ -155,6 +217,7 @@
           </div>
         </div>
       </section>
+      </template>
     </aside>
 
     <Transition name="places-modal-zoom">

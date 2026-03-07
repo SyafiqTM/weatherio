@@ -1,3 +1,22 @@
+/* ── Skeleton Loading ── */
+@keyframes skeleton-shimmer {
+  from { background-position: -600px 0; }
+  to   { background-position:  600px 0; }
+}
+
+.skel {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.07) 0%,
+    rgba(255, 255, 255, 0.22) 40%,
+    rgba(255, 255, 255, 0.07) 80%
+  );
+  background-size: 1200px 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
 /* ── Forecast Board ── */
 .forecast-board {
   background: rgba(255 255 255 / 0.12);
